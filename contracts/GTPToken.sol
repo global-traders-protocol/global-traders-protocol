@@ -3,7 +3,7 @@
 pragma solidity ^0.8.4;
 
 contract GTPToken {
-    string public name = "GT Protocol Token";
+    string public name = "GT-Protocol Token";
     string public symbol = "GTP";
     uint256 public totalSupply = 100000000000000000000000000; // 1 million tokens
     uint8 public decimals = 18;
