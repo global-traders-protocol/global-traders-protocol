@@ -354,7 +354,7 @@ contract BEP20Token is Context, IBEP20, Ownable {
     _name = "GT-Protocol Token";
     _symbol = "GTP";
     _decimals = 18;
-    _totalSupply = 100000000000000000000000000; // 1 million tokens
+    _totalSupply = 100000000000000000000000000; // 100 million tokens
     _balances[msg.sender] = _totalSupply;
 
     emit Transfer(address(0), msg.sender, _totalSupply);
@@ -496,10 +496,10 @@ contract BEP20Token is Context, IBEP20, Ownable {
    *
    * - `msg.sender` must be the token owner
    */
-  function mint(uint256 amount) public onlyOwner returns (bool) {
-    _mint(_msgSender(), amount);
-    return true;
-  }
+  /* function mint(uint256 amount) public onlyOwner returns (bool) { */
+  /*   /\* _mint(_msgSender(), amount); *\/ */
+  /*   return true; */
+  /* } */
 
   /**
    * @dev Moves tokens `amount` from `sender` to `recipient`.
