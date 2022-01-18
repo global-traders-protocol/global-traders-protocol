@@ -107,6 +107,7 @@ contract Vesting is Ownable {
     function getAvailableBalance(uint256 id) public view returns (uint256) {
         VestingParams memory vestParams = vestings[id];
         uint256 amount;
+        if (block.timestamp < vestParams.lastUpdate) return amount;
         if (block.timestamp >= vestParams.vestingEnd) {
             amount = vestParams.amount - vestParams.claimed;
         } else {

@@ -38,7 +38,7 @@ contract Token is ERC20, Ownable {
         address to,
         uint256 amount
     ) internal override {
-        if (from == address(0) || to == address(0)) return;
+        if (from == address(0)) return;
         if (liquidityRestrictionEnabled && address(liquidityRestrictor) != address(0)) {
             (bool allow, string memory message) = liquidityRestrictor
                 .assureLiquidityRestrictions(from, to);
