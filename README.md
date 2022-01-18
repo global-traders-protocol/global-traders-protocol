@@ -1,16 +1,32 @@
-### Hi there 👋
+# GT-Protocol
 
-<!--
-**global-traders-protocol/global-traders-protocol** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## Compile
 
-Here are some ideas to get you started:
+Copy `example.env` to a new file called `.env` and fill the values in it.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+```
+npx hardhat compile
+```
+
+## Test
+
+```
+npx hardhat test
+```
+
+## Deploy GTP Token
+
+Run:
+
+```
+npx hardhat run scripts/deploy-token.ts --network [Your Network]
+```
+
+## Deploy Vesting
+
+Don't forget to paste GTP token address to `.env` variable `GTP`
+Run:
+
+```
+npx hardhat run scripts/deploy-vesting.ts --network [Your Network]
+```

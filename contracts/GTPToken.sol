@@ -20,7 +20,7 @@ interface IAntisnipe {
         uint256 amount
     ) external returns (bool response);
 }
-contract Token is ERC20, Ownable {
+contract GTP is ERC20, Ownable {
     constructor() ERC20('GT-Protocol Token', 'GTP') {
         _mint(msg.sender, 100_000_000 * 10**18);
     }
