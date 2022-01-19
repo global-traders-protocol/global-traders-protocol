@@ -13,6 +13,7 @@ contract Vesting is Ownable {
 
     struct VestingParams {
         uint256 amount;
+        uint256 unlocked;
         uint256 vestingBegin;
         uint256 vestingEnd;
         uint256 lastUpdate;
@@ -59,8 +60,9 @@ contract Vesting is Ownable {
             uint256 amount = getAvailableBalance(vestingIds[account][i]);
             if (amount > 0) {
                 totalAmount += amount;
-                vestings[vestingIds[account][i]].claimed += amount;
+                vestings[vestingIds[account][i]].claimed += amount - vestings[vestingIds[account][i]].unlocked;
                 vestings[vestingIds[account][i]].lastUpdate = block.timestamp;
+                vestings[vestingIds[account][i]].unlocked = 0;
             }
         }
         gtp.safeTransfer(account, totalAmount);
@@ -116,6 +118,7 @@ contract Vesting is Ownable {
                     (block.timestamp - vestParams.lastUpdate)) /
                 (vestParams.vestingEnd - vestParams.vestingBegin);
         }
+        amount += vestParams.unlocked;
         return amount;
     }
 
@@ -148,19 +151,15 @@ contract Vesting is Ownable {
             "Vesting::holdTokens: unlocked can not be greater than amount"
         );
 
-        if (params.unlocked > 0) {
-            gtp.transfer(params.recipient, params.unlocked);
-        }
-        if (params.unlocked < params.amount) {
-            vestings[_nextVestingId] = VestingParams({
-                amount: params.amount - params.unlocked,
-                vestingBegin: params.vestingBegin,
-                vestingEnd: params.vestingEnd,
-                lastUpdate: params.vestingBegin,
-                claimed: 0
+        vestings[_nextVestingId] = VestingParams({
+            amount: params.amount - params.unlocked,
+            unlocked: params.unlocked,
+            vestingBegin: params.vestingBegin,
+            vestingEnd: params.vestingEnd,
+            lastUpdate: params.vestingBegin,
+            claimed: 0
             });
-            vestingIds[params.recipient].push(_nextVestingId);
-            _nextVestingId++;
-        }
+        vestingIds[params.recipient].push(_nextVestingId);
+        _nextVestingId++;
     }
 }

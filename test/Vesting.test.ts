@@ -120,23 +120,33 @@ describe("Vesting Test", function () {
                 },
             ]);
 
-            expect(await gtp.balanceOf(adr1.address)).to.equal(10000);
-            expect(await gtp.balanceOf(adr2.address)).to.equal(100000);
+            expect(await gtp.balanceOf(adr1.address)).to.equal(0);
+            expect(await gtp.balanceOf(adr2.address)).to.equal(0);
             expect(await gtp.balanceOf(adr3.address)).to.equal(0);
 
             expect(await vesting.vestingCountOf(adr1.address)).to.equal(1);
             expect(await vesting.vestingIds(adr1.address, 0)).to.equal(0);
+
             const vesting1 = await vesting.vestings(0);
             expect(vesting1.amount).to.equal(90000);
+            expect(vesting1.unlocked).to.equal(10000);
             expect(vesting1.lastUpdate).to.equal(vestingBegin);
             expect(vesting1.claimed).to.equal(0);
 
-            expect(await vesting.vestingCountOf(adr2.address)).to.equal(0);
+            expect(await vesting.vestingCountOf(adr2.address)).to.equal(1);
+            expect(await vesting.vestingIds(adr2.address, 0)).to.equal(1);
+            const vesting2 = await vesting.vestings(1);
+            expect(vesting2.amount).to.equal(0);
+            expect(vesting2.unlocked).to.equal(100000);
+            expect(vesting2.lastUpdate).to.equal(vestingBegin);
+            expect(vesting2.claimed).to.equal(0);
+
 
             expect(await vesting.vestingCountOf(adr3.address)).to.equal(1);
-            expect(await vesting.vestingIds(adr3.address, 0)).to.equal(1);
-            const vesting3 = await vesting.vestings(1);
+            expect(await vesting.vestingIds(adr3.address, 0)).to.equal(2);
+            const vesting3 = await vesting.vestings(2);
             expect(vesting3.amount).to.equal(100000);
+            expect(vesting3.unlocked).to.equal(0);
             expect(vesting3.lastUpdate).to.equal(vestingBegin);
             expect(vesting3.claimed).to.equal(0);
         });
@@ -195,15 +205,40 @@ describe("Vesting Test", function () {
         it("Can claim 0 if lastUpdate in future", async function () {
             expect(await vesting.getAvailableBalanceOf(adr1.address)).to.equal(0);
             await vesting.claim(adr1.address)
-            expect(await gtp.balanceOf(adr1.address)).to.equal(10000);
-            await increaseTime(100);
-            expect(await vesting.getAvailableBalanceOf(adr1.address)).to.equal(0);
+            expect(await gtp.balanceOf(adr1.address)).to.equal(0);
         })
 
-        it("Can claim 0 if lastUpdate now", async function () {
+        it("Can claim unlocked if lastUpdate now", async function () {
             await increaseTime(100);
-            expect(await vesting.getAvailableBalanceOf(adr1.address)).to.equal(0);
+            expect(await vesting.getAvailableBalanceOf(adr1.address)).to.equal(10000);
+
+            const vesting1 = await vesting.vestings(0);
+            expect(vesting1.amount).to.equal(90000);
+            expect(vesting1.unlocked).to.equal(10000);
+            expect(vesting1.lastUpdate).to.equal(vestingBegin);
+            expect(vesting1.claimed).to.equal(0);
+
             await vesting.claim(adr1.address)
+            const current_block = await ethers.provider.getBlock(
+                await ethers.provider.getBlockNumber()
+            );
+
+            const vesting_after = await vesting.vestings(0);
+            expect(vesting_after.amount).to.equal(90000);
+            expect(vesting_after.unlocked).to.equal(0);
+            expect(vesting_after.lastUpdate).to.equal(current_block.timestamp);
+            expect(vesting_after.claimed).to.equal(0);
+            
+            expect(await gtp.balanceOf(adr1.address)).to.equal(10000);
+
+            await increaseTime(50000000);
+            await vesting.claim(adr1.address);
+            expect(await gtp.balanceOf(adr1.address)).to.equal(100000);
+
+            const vesting_finish = await vesting.vestings(0);
+            expect(vesting_finish.amount).to.equal(90000);
+            expect(vesting_finish.unlocked).to.equal(0);
+            expect(vesting_finish.claimed).to.equal(90000);
         })
     });
 });

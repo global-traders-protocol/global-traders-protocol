@@ -17,7 +17,7 @@ async function main() {
 
         await hre.run("verify:verify", {
             address: gtp.address,
-            contract: "contracts/GTP.sol:GTP",
+            contract: "contracts/GTPToken.sol:GTP",
         });
     }
 }
